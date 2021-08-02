@@ -3,7 +3,9 @@ package com.okode.moviepedia.service;
 import com.okode.moviepedia.model.ImageUrlResponse;
 import com.okode.moviepedia.model.Movie;
 import com.okode.moviepedia.model.QueryResponse;
+import com.okode.moviepedia.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -14,14 +16,16 @@ import static com.okode.moviepedia.utils.AppConstants.*;
 public class MovieService {
 
   private final WebClient webClient;
+  private String apiKey;
 
   @Autowired
-  public MovieService(WebClient webClient) {
+  public MovieService(WebClient webClient, Environment env) {
     this.webClient = webClient;
+    this.apiKey = env.getProperty(AppConstants.API_PROPERTY_NAME);
   }
 
   public Mono<Movie> getById(long movieId) {
-    String uriPath = MOVIE_BASE_URL + "/movie/" + movieId + "?api_key=" + API_TOKEN;
+    String uriPath = MOVIE_BASE_URL + "/movie/" + movieId + "?api_key=" + this.apiKey;
     return this.webClient.get().uri(uriPath).retrieve().bodyToMono(Movie.class);
   }
 
@@ -35,11 +39,11 @@ public class MovieService {
       pageValue = "&page=" + page;
     }
     String uriWithoutPage =
-        MOVIE_BASE_URL + "/search/movie?api_key=" + API_TOKEN + "&query=" + title;
-    String uriPathWithPage = uriWithoutPage + pageValue;
+        MOVIE_BASE_URL + "/search/movie?api_key=" + this.apiKey + "&query=" + title;
+    String finalUri = uriWithoutPage + pageValue;
     return this.webClient
         .get()
-        .uri(uriPathWithPage)
+        .uri(finalUri)
         .retrieve()
         .bodyToMono(QueryResponse.class)
         .flatMap(response -> handleQueryResponse(response, page, uriWithoutPage));
