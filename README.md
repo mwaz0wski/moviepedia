@@ -6,4 +6,4 @@ This application allows you to search for a large number of movies, and access t
 ```
 mvn spring-boot:run
 ```
-To access it after deployment navigate to http://localhost:8080
+To access the application navigate to http://localhost:8080
