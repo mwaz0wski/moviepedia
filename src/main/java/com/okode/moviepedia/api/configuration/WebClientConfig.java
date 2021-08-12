@@ -1,4 +1,4 @@
-package com.okode.moviepedia.configuration;
+package com.okode.moviepedia.api.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

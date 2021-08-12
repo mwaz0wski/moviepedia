@@ -1,4 +1,4 @@
-package com.okode.moviepedia.model;
+package com.okode.moviepedia.api.model;
 
 import lombok.Data;
 
