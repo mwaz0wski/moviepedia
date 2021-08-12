@@ -1,4 +1,4 @@
-package com.okode.moviepedia.model;
+package com.okode.moviepedia.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

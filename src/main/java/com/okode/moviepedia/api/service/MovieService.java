@@ -1,11 +1,10 @@
-package com.okode.moviepedia.service;
+package com.okode.moviepedia.api.service;
 
-import com.okode.moviepedia.model.ImageUrlResponse;
-import com.okode.moviepedia.model.Movie;
-import com.okode.moviepedia.model.QueryResponse;
-import com.okode.moviepedia.utils.AppConstants;
+import com.okode.moviepedia.api.model.ImageUrlResponse;
+import com.okode.moviepedia.api.model.Movie;
+import com.okode.moviepedia.api.model.QueryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -16,17 +15,23 @@ import static com.okode.moviepedia.utils.AppConstants.*;
 public class MovieService {
 
   private final WebClient webClient;
+
+  @Value(API_KEY_PROPERTY)
   private String apiKey;
 
   @Autowired
-  public MovieService(WebClient webClient, Environment env) {
+  public MovieService(WebClient webClient) {
     this.webClient = webClient;
-    this.apiKey = env.getProperty(AppConstants.API_PROPERTY_NAME);
   }
 
   public Mono<Movie> getById(long movieId) {
-    String uriPath = MOVIE_BASE_URL + "/movie/" + movieId + "?api_key=" + this.apiKey;
-    return this.webClient.get().uri(uriPath).retrieve().bodyToMono(Movie.class);
+    StringBuilder uri =
+        new StringBuilder(MOVIE_BASE_URL)
+            .append("/movie/")
+            .append(movieId)
+            .append("?api_key=")
+            .append(this.apiKey);
+    return this.webClient.get().uri(uri.toString()).retrieve().bodyToMono(Movie.class);
   }
 
   public Mono<QueryResponse> queryByTitle(String title, Long page) {
@@ -34,13 +39,17 @@ public class MovieService {
       If a page parameter was included in the request, add the parameter to the
       composed url
     */
-    String pageValue = "";
+    StringBuilder pageValue = new StringBuilder();
     if (page != null) {
-      pageValue = "&page=" + page;
+      pageValue.append("&page=").append(page);
     }
-    String uriWithoutPage =
-        MOVIE_BASE_URL + "/search/movie?api_key=" + this.apiKey + "&query=" + title;
-    String finalUri = uriWithoutPage + pageValue;
+    StringBuilder uriWithoutPage =
+        new StringBuilder(MOVIE_BASE_URL)
+            .append("/search/movie?api_key=")
+            .append(this.apiKey)
+            .append("&query=")
+            .append(title);
+    String finalUri = uriWithoutPage.append(pageValue).toString();
     return this.webClient
         .get()
         .uri(finalUri)
@@ -50,11 +59,11 @@ public class MovieService {
   }
 
   private Mono<QueryResponse> handleQueryResponse(
-      QueryResponse response, Long page, String uriWithoutPage) {
+      QueryResponse response, Long page, StringBuilder uriWithoutPage) {
     if (page != null && response.getTotalPages() < page) {
       return this.webClient
           .get()
-          .uri(uriWithoutPage + "&page=" + response.getTotalPages())
+          .uri(uriWithoutPage.append("&page=").append(response.getTotalPages()).toString())
           .retrieve()
           .bodyToMono(QueryResponse.class);
     } else {
@@ -70,7 +79,13 @@ public class MovieService {
     String imagePath = movie.getPosterPath();
     ImageUrlResponse imageUrl = new ImageUrlResponse();
     if (imagePath != null) {
-      imageUrl.setImageUrl(IMAGE_BASE_URL + "/w" + size + "/" + imagePath);
+      imageUrl.setImageUrl(
+          new StringBuilder(IMAGE_BASE_URL)
+              .append("/w")
+              .append(size)
+              .append("/")
+              .append(imagePath)
+              .toString());
     } else {
       imageUrl.setImageUrl("not-found");
     }

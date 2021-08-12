@@ -1,4 +1,4 @@
-package com.okode.moviepedia.configuration;
+package com.okode.moviepedia.api.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;

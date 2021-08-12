@@ -1,9 +1,9 @@
-package com.okode.moviepedia.controller;
+package com.okode.moviepedia.api.controller;
 
-import com.okode.moviepedia.model.ImageUrlResponse;
-import com.okode.moviepedia.model.Movie;
-import com.okode.moviepedia.model.QueryResponse;
-import com.okode.moviepedia.service.MovieService;
+import com.okode.moviepedia.api.model.ImageUrlResponse;
+import com.okode.moviepedia.api.model.Movie;
+import com.okode.moviepedia.api.model.QueryResponse;
+import com.okode.moviepedia.api.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
